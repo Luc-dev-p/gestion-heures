@@ -1,0 +1,176 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//////////////////////
+// ENUMS
+//////////////////////
+
+enum UserRole {
+  ADMIN
+  RH
+  TEACHER
+}
+
+enum TeacherStatus {
+  PERMANENT
+  VACATAIRE
+}
+
+enum TeacherGrade {
+  ASSISTANT
+  MAITRE_ASSISTANT
+  PROFESSEUR
+  AUTRE
+}
+
+enum HourStatus {
+  DRAFT
+  VALIDATED
+  PAID
+}
+
+//////////////////////
+// MODELS
+//////////////////////
+
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  password String
+  role     UserRole
+
+  teacher Teacher?
+  logs    ActivityLog[]
+}
+
+model Department {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  teachers Teacher[]
+  subjects Subject[]
+}
+
+model Teacher {
+  id        Int          @id @default(autoincrement())
+  firstname String
+  lastname  String
+  grade     TeacherGrade
+  status    TeacherStatus
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+
+  departmentId Int
+  department   Department @relation(fields: [departmentId], references: [id])
+
+  teacherSubjects TeacherSubject[]
+  hourRates       HourRate[]
+}
+
+model HourRate {
+  id            Int    @id @default(autoincrement())
+  normalRate    Float
+  extraRate     Float
+  contractHours Float  @default(192)
+
+  teacherId Int
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
+
+  academicYearId Int
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+
+  @@unique([teacherId, academicYearId])
+}
+
+model AcademicYear {
+  id        Int      @id @default(autoincrement())
+  label     String   @unique
+  startDate DateTime
+  endDate   DateTime
+  is_active Boolean  @default(false)
+
+  hourEntries     HourEntry[]
+  teacherSubjects TeacherSubject[]
+  hourRates       HourRate[]
+}
+
+model Subject {
+  id            Int    @id @default(autoincrement())
+  name          String
+  level         String
+  field         String
+  planned_hours Float
+
+  departmentId Int
+  department   Department @relation(fields: [departmentId], references: [id])
+
+  teacherSubjects TeacherSubject[]
+}
+
+model TeacherSubject {
+  id Int @id @default(autoincrement())
+
+  teacherId Int
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
+
+  subjectId Int
+  subject   Subject @relation(fields: [subjectId], references: [id])
+
+  academicYearId Int
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+
+  specific_rate Float?
+  max_hours     Float?
+
+  hourEntries HourEntry[]
+
+  @@unique([teacherId, subjectId, academicYearId])
+}
+
+model HourType {
+  id          Int    @id @default(autoincrement())
+  name        String @unique
+  coefficient Float
+
+  hourEntries HourEntry[]
+}
+
+model HourEntry {
+  id Int @id @default(autoincrement())
+
+  teacherSubjectId Int
+  teacherSubject   TeacherSubject @relation(fields: [teacherSubjectId], references: [id])
+
+  hourTypeId Int
+  hourType   HourType @relation(fields: [hourTypeId], references: [id])
+
+  date       DateTime
+  start_time DateTime
+  end_time   DateTime
+  duration   Float
+
+  room   String
+  note   String?
+  status HourStatus @default(DRAFT)
+
+  academicYearId Int
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+}
+
+model ActivityLog {
+  id        Int      @id @default(autoincrement())
+  action    String
+  entity    String
+  entityId  Int
+  timestamp DateTime @default(now())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+}
