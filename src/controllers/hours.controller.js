@@ -200,3 +200,29 @@ export const getTeacherSummary = async (req, res) => {
     return res.status(500).json({ message: 'Erreur serveur', error: err.message })
   }
 }
+// GET /api/hours/teacher-subjects
+export const getTeacherSubjects = async (req, res) => {
+  try {
+    const ts = await prisma.teacherSubject.findMany({
+      include: {
+        teacher: true,
+        subject: true,
+        academicYear: true
+      }
+    })
+    return res.status(200).json(ts)
+  } catch (err) {
+    return res.status(500).json({ message: 'Erreur serveur', error: err.message })
+  }
+}
+
+// GET /api/hours/hour-types
+export const getHourTypes = async (req, res) => {
+  try {
+    const types = await prisma.hourType.findMany()
+    return res.status(200).json(types)
+  } catch (err) {
+    return res.status(500).json({ message: 'Erreur serveur', error: err.message })
+  }
+}
+

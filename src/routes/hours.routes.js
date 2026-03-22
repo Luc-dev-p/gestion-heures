@@ -5,7 +5,9 @@ import {
   createHourEntry,
   updateHourStatus,
   deleteHourEntry,
-  getTeacherSummary
+  getTeacherSummary,
+  getTeacherSubjects,
+  getHourTypes
 } from '../controllers/hours.controller.js'
 import { authenticate } from '../middlewares/auth.middleware.js'
 import { requireRole } from '../middlewares/role.middleware.js'
@@ -14,8 +16,12 @@ const router = Router()
 
 router.use(authenticate)
 
-router.get('/', getAllHours)
+// ⚠️ Routes fixes AVANT les routes avec :id
+router.get('/teacher-subjects', getTeacherSubjects)
+router.get('/hour-types', getHourTypes)
 router.get('/summary/:teacherId', getTeacherSummary)
+
+router.get('/', getAllHours)
 router.get('/:id', getHourById)
 router.post('/', requireRole('ADMIN', 'RH'), createHourEntry)
 router.patch('/:id/status', requireRole('ADMIN', 'RH'), updateHourStatus)

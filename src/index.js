@@ -8,6 +8,8 @@ import subjectRoutes from './routes/subjects.routes.js'
 import hourRoutes from './routes/hours.routes.js'
 import dashboardRoutes from './routes/dashboard.routes.js'
 import departmentRoutes from './routes/departments.routes.js'
+import academicYearRoutes from './routes/academic-years.routes.js'
+
 
 dotenv.config()
 
@@ -21,6 +23,7 @@ app.use('/api/subjects', subjectRoutes)
 app.use('/api/hours', hourRoutes)
 app.use('/api/dashboard', dashboardRoutes)
 app.use('/api/departments', departmentRoutes)
+app.use('/api/academic-years', academicYearRoutes)
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
