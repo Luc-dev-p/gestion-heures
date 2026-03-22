@@ -51,6 +51,9 @@ app.post("/users", async (req, res) => {
       role: "TEACHER",
     },
   });
+  app.use(cors({
+  origin: 'https://gestion-heures-frontend.vercel.app'
+}))
 
   res.json(user);
 });
