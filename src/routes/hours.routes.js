@@ -11,6 +11,9 @@ import {
 } from '../controllers/hours.controller.js'
 import { authenticate } from '../middlewares/auth.middleware.js'
 import { requireRole } from '../middlewares/role.middleware.js'
+import { createHourType } from '../controllers/hours.controller.js'
+
+
 
 const router = Router()
 
@@ -26,5 +29,6 @@ router.get('/:id', getHourById)
 router.post('/', requireRole('ADMIN', 'RH'), createHourEntry)
 router.patch('/:id/status', requireRole('ADMIN', 'RH'), updateHourStatus)
 router.delete('/:id', requireRole('ADMIN', 'RH'), deleteHourEntry)
+router.post('/hour-types', requireRole('ADMIN'), createHourType)
 
 export default router

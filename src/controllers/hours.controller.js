@@ -142,6 +142,20 @@ export const deleteHourEntry = async (req, res) => {
   }
 }
 
+// POST /api/hours/hour-types
+export const createHourType = async (req, res) => {
+  const { name, coefficient } = req.body
+  try {
+    const hourType = await prisma.hourType.create({
+      data: { name, coefficient: parseFloat(coefficient) }
+    })
+    return res.status(201).json({ message: 'Type créé', hourType })
+  } catch (err) {
+    if (err.code === 'P2002') return res.status(409).json({ message: 'Type déjà existant' })
+    return res.status(500).json({ message: 'Erreur serveur', error: err.message })
+  }
+}
+
 // GET /api/hours/summary/:teacherId — récapitulatif par enseignant
 export const getTeacherSummary = async (req, res) => {
   const teacherId = parseInt(req.params.teacherId)
